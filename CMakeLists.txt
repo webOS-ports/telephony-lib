@@ -13,7 +13,7 @@ set(TELEPHONY_EXTERNAL_FILES
     external/phonenumber.js/PhoneNumberNormalizer.js)
 
 set(TELEPHONY_FILES
-    qml/phonenumber.js
+    qml/phonenumbers.js
     qml/qmldir)
 
 install(FILES ${TELEPHONY_EXTERNAL_FILES}

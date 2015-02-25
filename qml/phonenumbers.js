@@ -8,10 +8,6 @@ function isPlain(number) {
 	return PhoneNumber.IsPlain(number);
 }
 
-function normalize(number) {
-	return PhoneNumber.Normalize(number);
-}
-
 function parse(number, region) {
-	return PhoneNumber.parse(number, region);
+	return PhoneNumber.Parse(number, region);
 }

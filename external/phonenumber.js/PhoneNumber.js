@@ -5,18 +5,18 @@ var PhoneNumber = (function (dataBase) {
   // Use strict in our context only - users might not want it
   'use strict';
 
-  const MAX_PHONE_NUMBER_LENGTH = 50;
-  const NON_ALPHA_CHARS = /[^a-zA-Z]/g;
-  const NON_DIALABLE_CHARS = /[^,#+\*\d]/g;
-  const NON_DIALABLE_CHARS_ONCE = new RegExp(NON_DIALABLE_CHARS.source);
-  const BACKSLASH = /\\/g;
-  const SPLIT_FIRST_GROUP = /^(\d+)(.*)$/;
-  const LEADING_PLUS_CHARS_PATTERN = /^[+\uFF0B]+/g;
+  var MAX_PHONE_NUMBER_LENGTH = 50;
+  var NON_ALPHA_CHARS = /[^a-zA-Z]/g;
+  var NON_DIALABLE_CHARS = /[^,#+\*\d]/g;
+  var NON_DIALABLE_CHARS_ONCE = new RegExp(NON_DIALABLE_CHARS.source);
+  var BACKSLASH = /\\/g;
+  var SPLIT_FIRST_GROUP = /^(\d+)(.*)$/;
+  var LEADING_PLUS_CHARS_PATTERN = /^[+\uFF0B]+/g;
 
   // Format of the string encoded meta data. If the name contains "^" or "$"
   // we will generate a regular expression from the value, with those special
   // characters as prefix/suffix.
-  const META_DATA_ENCODING = ["region",
+  var META_DATA_ENCODING = ["region",
                               "^(?:internationalPrefix)",
                               "nationalPrefix",
                               "^(?:nationalPrefixForParsing)",
@@ -26,7 +26,7 @@ var PhoneNumber = (function (dataBase) {
                               "^nationalPattern$",
                               "formats"];
 
-  const FORMAT_ENCODING = ["^pattern$",
+  var FORMAT_ENCODING = ["^pattern$",
                            "nationalFormat",
                            "^leadingDigits",
                            "nationalPrefixFormattingRule",
@@ -106,8 +106,8 @@ var PhoneNumber = (function (dataBase) {
               // the formats field from the main country.
               if (typeof entry[0] == "string")
                 entry[0] = ParseMetaData(countryCode, entry[0]);
-              let formats = entry[0].formats;
-              let current = ParseMetaData(countryCode, entry[n]);
+              var formats = entry[0].formats;
+              var current = ParseMetaData(countryCode, entry[n]);
               current.formats = formats;
               return entry[n] = current;
             }
@@ -186,33 +186,11 @@ var PhoneNumber = (function (dataBase) {
     this.region = regionMetaData.region;
     this.regionMetaData = regionMetaData;
     this.nationalNumber = number;
+    this.internationalFormat = FormatNumber(this.regionMetaData, this.nationalNumber, true);
+    this.nationalFormat = FormatNumber(this.regionMetaData, this.nationalNumber, false);
+    var internationalNumber = this.internationalFormat ? this.internationalFormat.replace(NON_DIALABLE_CHARS, "")
+                                                       : null;
   }
-
-  // NationalNumber represents the result of parsing a phone number. We have
-  // three getters on the prototype that format the number in national and
-  // international format. Once called, the getters put a direct property
-  // onto the object, caching the result.
-  NationalNumber.prototype = {
-    // +1 949-726-2896
-    get internationalFormat() {
-      var value = FormatNumber(this.regionMetaData, this.nationalNumber, true);
-      Object.defineProperty(this, "internationalFormat", { value: value, enumerable: true });
-      return value;
-    },
-    // (949) 726-2896
-    get nationalFormat() {
-      var value = FormatNumber(this.regionMetaData, this.nationalNumber, false);
-      Object.defineProperty(this, "nationalFormat", { value: value, enumerable: true });
-      return value;
-    },
-    // +19497262896
-    get internationalNumber() {
-      var value = this.internationalFormat ? this.internationalFormat.replace(NON_DIALABLE_CHARS, "")
-                                           : null;
-      Object.defineProperty(this, "internationalNumber", { value: value, enumerable: true });
-      return value;
-    }
-  };
 
   // Check whether the number is valid for the given region.
   function IsValidNumber(number, md) {
